@@ -62,15 +62,18 @@ void Flashbang(int owner)
 
         if(PointWithinViewAngle(targetPos, ownerPos, angles, fov))
         {
-            UTIL_ScreenFade(client, colors, 5.0, 3.0, FFADE_IN);
-
             // 본인은 제외
-            TR_TraceRay(targetPos, ownerPos, MASK_ALL, RayType_EndPoint); // TODO: 창문 같은 경우는 OK
-            if(!TR_DidHit())
+            TR_TraceRayFilter(targetPos, ownerPos, MASK_ALL, RayType_EndPoint, Filter_Everyone, owner); // TODO: 창문 같은 경우는 OK
+            if(!TR_DidHit() || TR_GetEntityIndex() == client)
             {
                 // TODO; 플래시뱅 강약 조절: 보이는 각도에 따른 플래시 지속시간
                 UTIL_ScreenFade(client, colors, 5.0, 3.0, FFADE_IN);
             }
         }
     }
+}
+
+public bool Filter_Everyone(int entity, int contentsMask, any data)
+{
+	return (entity == 0 || (entity != data));
 }
